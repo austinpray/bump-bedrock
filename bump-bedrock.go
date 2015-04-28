@@ -24,8 +24,10 @@ type Tag struct {
 
 type Tags []Tag
 
+var APITagsUrl string = "https://api.github.com/repos/johnpbloch/wordpress/tags"
+
 func GetWordPressTags() Tags {
-	response, err := http.Get("https://api.github.com/repos/johnpbloch/wordpress/tags")
+	response, err := http.Get(APITagsUrl)
 	res := Tags{}
 	if err != nil {
 		fmt.Printf("%s", err)
@@ -42,6 +44,22 @@ func GetWordPressTags() Tags {
 	return res
 }
 
+func Bump(c *cli.Context) {
+	dir := c.Args().First()
+	if dir == "" {
+		fmt.Println("You need to specify a bedrock dir")
+		os.Exit(1)
+	}
+
+	bedrock.NewBedrock(dir)
+
+	bedrock.UpdateWordPressVersion(GetWordPressTags()[0].Name)
+}
+
+func GetVersion(c *cli.Context) {
+	fmt.Println(GetWordPressTags()[0].Name)
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Usage = "bump that bedrock version son"
@@ -51,25 +69,12 @@ func main() {
 			Name:    "getversion",
 			Aliases: []string{"getv"},
 			Usage:   "Get the most recent WordPress version",
-			Action: func(c *cli.Context) {
-				fmt.Println(GetWordPressTags()[0].Name)
-			},
+			Action:  GetVersion,
 		},
 		{
-			Name:  "bump",
-			Usage: "Execute a bump. Update Changelog, Composer.json",
-			Action: func(c *cli.Context) {
-				dir := c.Args().First()
-				if dir == "" {
-					fmt.Println("You need to specify a bedrock dir")
-					os.Exit(1)
-				}
-
-				bedrock.NewBedrock(dir)
-
-				bedrock.UpdateWordPressVersion(GetWordPressTags()[0].Name)
-
-			},
+			Name:   "bump",
+			Usage:  "Execute a bump. Update Changelog, Composer.json",
+			Action: Bump,
 		},
 	}
 
