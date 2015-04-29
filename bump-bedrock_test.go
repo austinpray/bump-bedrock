@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -27,8 +26,7 @@ func captureStdout(f func()) string {
 	return buf.String()
 }
 
-func TestGetVersion(t *testing.T) {
-
+func mockTags() *httptest.Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[
 {
@@ -42,14 +40,30 @@ func TestGetVersion(t *testing.T) {
 	}
 		]`)
 	}))
+	return ts
+}
 
-	APITagsUrl = ts.URL
+func TestGetVersion(t *testing.T) {
 
 	// assert equality
-	c := cli.NewContext(nil, nil, nil)
 	output := captureStdout(func() {
-		GetVersion(c)
+		GetVersion(Tags{
+			Tag{
+				Name: "4.2.1",
+			},
+		})
 	})
 	assert.Equal(t, "4.2.1\n", output, "they should be equal")
+
+}
+
+func TestGetWordPressTags(t *testing.T) {
+	ts := mockTags()
+
+	tags := GetWordPressTags(ts.URL)
+
+	assert.NotNil(t, tags)
+	assert.Equal(t, "4.2.1", tags[0].Name, "first tag should be 4.2.1")
+	assert.Equal(t, 1, len(tags), "should have one array element")
 
 }

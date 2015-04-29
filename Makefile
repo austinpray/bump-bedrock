@@ -1,5 +1,7 @@
 SOURCES = $(shell find . -name "*.go")
 
+.PHONY: fmt test print-%
+
 all: bump-bedrock
 
 bump-bedrock: $(SOURCES)
@@ -7,6 +9,9 @@ bump-bedrock: $(SOURCES)
 
 fmt:
 	go fmt *.go
+
+test:
+	go test -cover
 
 print-%:
 	@echo $*=$($*)
