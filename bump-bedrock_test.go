@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/austinpray/bump-bedrock/bedrock/mocks"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -65,5 +66,15 @@ func TestGetWordPressTags(t *testing.T) {
 	assert.NotNil(t, tags)
 	assert.Equal(t, "4.2.1", tags[0].Name, "first tag should be 4.2.1")
 	assert.Equal(t, 1, len(tags), "should have one array element")
+}
+
+func TestBump(t *testing.T) {
+	testBedrock := new(mocks.BedrockRepo)
+
+	testBedrock.On("UpdateWordPressVersion", "4.2.0").Return(true, nil)
+
+	Bump(testBedrock, "4.2.0")
+
+	testBedrock.AssertExpectations(t)
 
 }

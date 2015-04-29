@@ -42,15 +42,8 @@ func GetWordPressTags(url string) Tags {
 	return res
 }
 
-func Bump(dir string, newWordPressVersion string) {
-	if dir == "" {
-		fmt.Println("You need to specify a bedrock dir")
-		os.Exit(1)
-	}
-
-	bedrock.NewBedrock(dir)
-
-	bedrock.UpdateWordPressVersion(newWordPressVersion)
+func Bump(b bedrock.BedrockRepo, newWordPressVersion string) {
+	b.UpdateWordPressVersion(newWordPressVersion)
 }
 
 func GetVersion(tags Tags) {
@@ -77,7 +70,10 @@ func main() {
 			Name:  "bump",
 			Usage: "Execute a bump. Update Changelog, Composer.json",
 			Action: func(c *cli.Context) {
-				Bump(c.Args().First(), GetWordPressTags(APITagsUrl)[0].Name)
+				Bump(
+					bedrock.NewBedrock(c.Args().First()),
+					GetWordPressTags(APITagsUrl)[0].Name,
+				)
 			},
 		},
 	}

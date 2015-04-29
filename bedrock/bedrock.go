@@ -11,9 +11,13 @@ import (
 	"time"
 )
 
-var bedrockPath string
-var composerJSONPath string
-var changelogPath string
+type BedrockRepo interface {
+	UpdateWordPressVersion(version string)
+}
+
+type BedrockRepoInstance struct {
+	bedrockPath, composerJSONPath, changelogPath string
+}
 
 func check(e error) {
 	if e != nil {
@@ -21,21 +25,23 @@ func check(e error) {
 	}
 }
 
-func NewBedrock(Path string) {
-	bedrockPath = Path
-	composerJSONPath = path.Join(bedrockPath, "composer.json")
-	changelogPath = path.Join(bedrockPath, "CHANGELOG.md")
+func NewBedrock(Path string) BedrockRepo {
+	return &BedrockRepoInstance{
+		bedrockPath:      Path,
+		composerJSONPath: path.Join(Path, "composer.json"),
+		changelogPath:    path.Join(Path, "CHANGELOG.md"),
+	}
 }
 
-func GetComposerJson() *gabs.Container {
-	dat, err := ioutil.ReadFile(composerJSONPath)
+func (b BedrockRepoInstance) GetComposerJson() *gabs.Container {
+	dat, err := ioutil.ReadFile(b.composerJSONPath)
 	check(err)
 	jsonParsed, err := gabs.ParseJSON(dat)
 	return jsonParsed
 }
 
-func UpdateComposerJSON(version string) {
-	input, err := ioutil.ReadFile(composerJSONPath)
+func (b BedrockRepoInstance) UpdateComposerJSON(version string) {
+	input, err := ioutil.ReadFile(b.composerJSONPath)
 	check(err)
 
 	lines := strings.Split(string(input), "\n")
@@ -46,11 +52,11 @@ func UpdateComposerJSON(version string) {
 		}
 	}
 	output := strings.Join(lines, "\n")
-	err = ioutil.WriteFile(composerJSONPath, []byte(output), 0644)
+	err = ioutil.WriteFile(b.composerJSONPath, []byte(output), 0644)
 	check(err)
 }
 
-func AddVersionNote(lines []string, i int, newWordPressVersion string) {
+func (b BedrockRepoInstance) AddVersionNote(lines []string, i int, newWordPressVersion string) {
 	lines = append(
 		lines[:i],
 		append(
@@ -60,7 +66,7 @@ func AddVersionNote(lines []string, i int, newWordPressVersion string) {
 	)
 }
 
-func AddTitle(lines []string, i int, nextBedrockVersion string) []string {
+func (b BedrockRepoInstance) AddTitle(lines []string, i int, nextBedrockVersion string) []string {
 	date := time.Now().Format("2006-01-02")
 
 	title := []string{fmt.Sprintf("### %s: %s", nextBedrockVersion, date), ""}
@@ -68,8 +74,8 @@ func AddTitle(lines []string, i int, nextBedrockVersion string) []string {
 	return append(title, lines...)
 }
 
-func UpdateChangelog(version string) {
-	input, err := ioutil.ReadFile(changelogPath)
+func (b BedrockRepoInstance) UpdateChangelog(version string) {
+	input, err := ioutil.ReadFile(b.changelogPath)
 	check(err)
 
 	var currentBedrockVersion string
@@ -100,20 +106,20 @@ func UpdateChangelog(version string) {
 	} else {
 		lines = append([]string{""}, lines...)
 	}
-	AddVersionNote(lines, i, version)
-	lines = AddTitle(lines, i, nextBedrockVersion)
+	b.AddVersionNote(lines, i, version)
+	lines = b.AddTitle(lines, i, nextBedrockVersion)
 
 	output := strings.Join(lines, "\n")
-	err = ioutil.WriteFile(changelogPath, []byte(output), 0644)
+	err = ioutil.WriteFile(b.changelogPath, []byte(output), 0644)
 	check(err)
 }
 
-func WordPressVersion() string {
-	value := GetComposerJson().Path("require.johnpbloch/wordpress").Data().(string)
+func (b BedrockRepoInstance) WordPressVersion() string {
+	value := b.GetComposerJson().Path("require.johnpbloch/wordpress").Data().(string)
 	return value
 }
 
-func UpdateWordPressVersion(version string) {
-	UpdateComposerJSON(version)
-	UpdateChangelog(version)
+func (b BedrockRepoInstance) UpdateWordPressVersion(version string) {
+	b.UpdateComposerJSON(version)
+	b.UpdateChangelog(version)
 }
