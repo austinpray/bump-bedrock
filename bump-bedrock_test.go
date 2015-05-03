@@ -71,7 +71,7 @@ func TestGetWordPressTags(t *testing.T) {
 func TestBump(t *testing.T) {
 	testBedrock := new(mocks.BedrockRepo)
 
-	testBedrock.On("UpdateWordPressVersion", "4.2.0").Return(true, nil)
+	testBedrock.On("UpdateWordPressVersion", "4.2.0").Return("4.2.0", nil)
 
 	Bump(testBedrock, "4.2.0")
 

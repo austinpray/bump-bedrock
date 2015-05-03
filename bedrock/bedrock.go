@@ -3,6 +3,7 @@ package bedrock
 import (
 	"fmt"
 	"github.com/jeffail/gabs"
+	"github.com/mcuadros/go-version"
 	"io/ioutil"
 	"path"
 	"regexp"
@@ -12,7 +13,7 @@ import (
 )
 
 type BedrockRepo interface {
-	UpdateWordPressVersion(version string)
+	UpdateWordPressVersion(version string) string
 }
 
 type BedrockRepoInstance struct {
@@ -25,8 +26,8 @@ func check(e error) {
 	}
 }
 
-func NewBedrock(Path string) BedrockRepo {
-	return &BedrockRepoInstance{
+func NewBedrock(Path string) BedrockRepoInstance {
+	return BedrockRepoInstance{
 		bedrockPath:      Path,
 		composerJSONPath: path.Join(Path, "composer.json"),
 		changelogPath:    path.Join(Path, "CHANGELOG.md"),
@@ -56,7 +57,7 @@ func (b BedrockRepoInstance) UpdateComposerJSON(version string) {
 	check(err)
 }
 
-func (b BedrockRepoInstance) AddVersionNote(lines []string, i int, newWordPressVersion string) {
+func (b BedrockRepoInstance) AddVersionNote(lines []string, i int, newWordPressVersion string) []string {
 	lines = append(
 		lines[:i],
 		append(
@@ -64,6 +65,7 @@ func (b BedrockRepoInstance) AddVersionNote(lines []string, i int, newWordPressV
 			lines[i:]...,
 		)...,
 	)
+	return lines
 }
 
 func (b BedrockRepoInstance) AddTitle(lines []string, i int, nextBedrockVersion string) []string {
@@ -72,6 +74,20 @@ func (b BedrockRepoInstance) AddTitle(lines []string, i int, nextBedrockVersion 
 	title := []string{fmt.Sprintf("### %s: %s", nextBedrockVersion, date), ""}
 
 	return append(title, lines...)
+}
+
+func (b BedrockRepoInstance) GetCurrentBedrockVersion(lines []string) string {
+	var currentBedrockVersion string
+
+	r := regexp.MustCompile(`### (\d?\.){2}\d`)
+	for _, line := range lines {
+		if r.FindStringIndex(line) != nil {
+			currentBedrockVersion = strings.Split(line, " ")[1]
+			currentBedrockVersion = strings.Replace(currentBedrockVersion, ":", "", 1)
+			break
+		}
+	}
+	return currentBedrockVersion
 }
 
 func (b BedrockRepoInstance) UpdateChangelog(version string) {
@@ -83,14 +99,7 @@ func (b BedrockRepoInstance) UpdateChangelog(version string) {
 	lines := strings.Split(string(input), "\n")
 
 	// find current version
-	r := regexp.MustCompile(`### (\d?\.){2}\d`)
-	for _, line := range lines {
-		if r.FindStringIndex(line) != nil {
-			currentBedrockVersion = strings.Split(line, " ")[1]
-			currentBedrockVersion = strings.Replace(currentBedrockVersion, ":", "", 1)
-			break
-		}
-	}
+	currentBedrockVersion = b.GetCurrentBedrockVersion(lines)
 
 	// calculate bumped version
 	nextBedrockVersionArray := strings.Split(currentBedrockVersion, ".")
@@ -106,7 +115,7 @@ func (b BedrockRepoInstance) UpdateChangelog(version string) {
 	} else {
 		lines = append([]string{""}, lines...)
 	}
-	b.AddVersionNote(lines, i, version)
+	lines = b.AddVersionNote(lines, i, version)
 	lines = b.AddTitle(lines, i, nextBedrockVersion)
 
 	output := strings.Join(lines, "\n")
@@ -119,7 +128,12 @@ func (b BedrockRepoInstance) WordPressVersion() string {
 	return value
 }
 
-func (b BedrockRepoInstance) UpdateWordPressVersion(version string) {
-	b.UpdateComposerJSON(version)
-	b.UpdateChangelog(version)
+func (b BedrockRepoInstance) UpdateWordPressVersion(v string) string {
+	if version.Compare(b.WordPressVersion(), v, "<") {
+		b.UpdateComposerJSON(v)
+		b.UpdateChangelog(v)
+		return "updated successfully"
+	} else {
+		return "nothing to update"
+	}
 }
