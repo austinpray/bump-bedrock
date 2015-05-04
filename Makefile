@@ -5,7 +5,10 @@ SOURCES = $(shell find . ./bedrock -name "*.go")
 all: bump-bedrock
 
 bump-bedrock: $(SOURCES)
-	go install
+	godep go install
+
+deps:
+	godep save -r ./...
 
 fmt:
 	go fmt *.go

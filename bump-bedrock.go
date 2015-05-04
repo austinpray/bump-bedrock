@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/austinpray/bump-bedrock/Godeps/_workspace/src/github.com/codegangsta/cli"
 	"github.com/austinpray/bump-bedrock/bedrock"
-	"github.com/codegangsta/cli"
 	"io/ioutil"
 	"net/http"
 	"os"

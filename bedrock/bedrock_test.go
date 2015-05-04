@@ -2,7 +2,7 @@ package bedrock
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
+	"github.com/austinpray/bump-bedrock/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"os/exec"

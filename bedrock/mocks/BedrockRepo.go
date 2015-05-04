@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/stretchr/testify/mock"
+import "github.com/austinpray/bump-bedrock/Godeps/_workspace/src/github.com/stretchr/testify/mock"
 
 type BedrockRepo struct {
 	mock.Mock

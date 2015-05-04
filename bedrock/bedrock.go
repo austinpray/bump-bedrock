@@ -2,8 +2,8 @@ package bedrock
 
 import (
 	"fmt"
-	"github.com/jeffail/gabs"
-	"github.com/mcuadros/go-version"
+	"github.com/austinpray/bump-bedrock/Godeps/_workspace/src/github.com/jeffail/gabs"
+	"github.com/austinpray/bump-bedrock/Godeps/_workspace/src/github.com/mcuadros/go-version"
 	"io/ioutil"
 	"log"
 	"os/exec"

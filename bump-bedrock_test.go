@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/austinpray/bump-bedrock/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"github.com/austinpray/bump-bedrock/bedrock/mocks"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
