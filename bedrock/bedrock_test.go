@@ -62,8 +62,8 @@ func TestUpdateComposerJSON(t *testing.T) {
 	}
 	b := NewBedrock(tmpRepo)
 	assert.Equal(t, "4.2.1", b.GetComposerJson().Path("require.johnpbloch/wordpress").Data().(string))
-	b.UpdateComposerJSON("100.10.10")
-	assert.Equal(t, "100.10.10", b.GetComposerJson().Path("require.johnpbloch/wordpress").Data().(string))
+	b.UpdateComposerJSON("4.0.4")
+	assert.Equal(t, "4.0.4", b.GetComposerJson().Path("require.johnpbloch/wordpress").Data().(string))
 }
 
 func TestWordPressVersion(t *testing.T) {

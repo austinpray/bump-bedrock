@@ -5,6 +5,8 @@ import (
 	"github.com/jeffail/gabs"
 	"github.com/mcuadros/go-version"
 	"io/ioutil"
+	"log"
+	"os/exec"
 	"path"
 	"regexp"
 	"strconv"
@@ -42,19 +44,12 @@ func (b BedrockRepoInstance) GetComposerJson() *gabs.Container {
 }
 
 func (b BedrockRepoInstance) UpdateComposerJSON(version string) {
-	input, err := ioutil.ReadFile(b.composerJSONPath)
-	check(err)
-
-	lines := strings.Split(string(input), "\n")
-
-	for i, line := range lines {
-		if strings.Contains(line, "johnpbloch/wordpress") {
-			lines[i] = fmt.Sprintf("    \"johnpbloch/wordpress\": \"%s\"", version)
-		}
+	cmd := exec.Command("composer.phar", "require", "johnpbloch/wordpress", version, "--no-update", "--no-progress")
+	cmd.Dir = b.bedrockPath
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
 	}
-	output := strings.Join(lines, "\n")
-	err = ioutil.WriteFile(b.composerJSONPath, []byte(output), 0644)
-	check(err)
 }
 
 func (b BedrockRepoInstance) AddVersionNote(lines []string, i int, newWordPressVersion string) []string {

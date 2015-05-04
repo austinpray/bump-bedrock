@@ -21,8 +21,8 @@ coverage:
 	go tool cover -html=all.out
 
 clean:
-	rm *.out
-	rm -r /tmp/bump-bedrock-test
+	rm -f *.out
+	rm -rf /tmp/bump-bedrock-test
 
 print-%:
 	@echo $*=$($*)
