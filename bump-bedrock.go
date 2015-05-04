@@ -43,7 +43,7 @@ func GetWordPressTags(url string) Tags {
 }
 
 func Bump(b bedrock.BedrockRepo, newWordPressVersion string) {
-	b.UpdateWordPressVersion(newWordPressVersion)
+	fmt.Println(b.UpdateWordPressVersion(newWordPressVersion))
 }
 
 func GetVersion(tags Tags) {
