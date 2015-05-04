@@ -1,0 +1,34 @@
+{
+	"ImportPath": "github.com/austinpray/bump-bedrock",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-98-g30b361b",
+			"Rev": "30b361bf66a60174a9589458afbf494478bafd00"
+		},
+		{
+			"ImportPath": "github.com/jeffail/gabs",
+			"Rev": "604daf8d0aaba8368c2599147a963aede53b435e"
+		},
+		{
+			"ImportPath": "github.com/mcuadros/go-version",
+			"Rev": "d52711f8d6bea8dc01efafdb68ad95a4e2606630"
+		},
+		{
+			"ImportPath": "github.com/stretchr/objx",
+			"Rev": "cbeaeb16a013161a98496fad62933b1d21786672"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "e22aedd37671fb115be6c0c25129c405cb575cfd"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/mock",
+			"Rev": "e22aedd37671fb115be6c0c25129c405cb575cfd"
+		}
+	]
+}
