@@ -52,7 +52,7 @@ func GetVersion(tags Tags) {
 
 func main() {
 
-	var APITagsUrl string = "https://api.github.com/repos/johnpbloch/wordpress/tags"
+	var APITagsUrl string = "https://api.github.com/repos/johnpbloch/wordpress-core/tags"
 
 	app := cli.NewApp()
 	app.Usage = "bump that bedrock version son"
